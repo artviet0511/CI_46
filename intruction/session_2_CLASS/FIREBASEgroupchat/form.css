@@ -1,0 +1,39 @@
+.input {
+    padding: 10px;
+    border: 0px;
+    border-bottom: 1px solid #cacaca;
+    font-size: 14px;
+    outline: none;
+}
+
+.input:focus {
+    border-bottom: 2px solid blue;
+}
+
+.input:focus ~ label {
+    color: blue;
+}
+
+.input-container {
+    margin: 10px 0px;
+}
+
+.input-container.line-break {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.input-container.input-container > label {
+    margin-bottom: 5px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 0px;
+}
+
+.btn-primary {
+    color: rgb(99, 99, 182);
+    background-color: rgb(75, 181, 223);
+}
