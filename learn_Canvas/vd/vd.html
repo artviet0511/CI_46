@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+
+    }
+
+    #myCanvas {
+        width: 400;
+        height: 400;
+        border: 1px solid blue;
+    }
+</style>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    <button type="button" onclick="start()">Start</button>
+</body>
+<script>
+    let canvas = document.getElementById("myCanvas");
+    let ctx = canvas.getContext("2d");
+    let ox = canvas.width / 2;
+    let oy = canvas.height / 2;
+    ctx.font = "42px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "red";
+    ctx.fillText("Hello world", ox, oy);
+    start = function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.translate(ox, oy);
+        ctx.rotate((Math.PI / 3));
+        ctx.fillText("Hello world", 0, 0)
+        ctx.translate(-ox, -oy);
+    }
+
+</script>
+
+</html>

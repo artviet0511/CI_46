@@ -26,6 +26,7 @@ export function sendMsg(content, conId) {
             email: firebase.auth().currentUser.email,
             displayName: firebase.auth().currentUser.displayName,
         },
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
     db.collection("messages").add(mesDoc);

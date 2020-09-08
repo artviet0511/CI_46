@@ -17,3 +17,7 @@
 .justify-end {
     justify-content: flex-end;
 }
+
+.flex-column-reverse {
+    flex-direction: column-reverse;
+}

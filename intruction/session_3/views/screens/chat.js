@@ -26,20 +26,26 @@ class ChatScreen extends HTMLElement {
 
         this.$messageList = this._shadowRoot.querySelector("#messageList");
 
+        this.$txtTitle = this._shadowRoot.querySelector("#txtTitle");
+
         this.conList = [];
         this.activeCon = "";
+        this.messageListener = null;
     }
 
     showListCon() {
         const $conList = document.createElement("con-list");
         $conList.list = JSON.stringify(this.conList);
-
         $conList.addEventListener("create-con", () => this.showCreateConForm());
+        $conList.addEventListener("changeActiveCon", (event) => {
+            this.activeCon = event.detail.id;
+            const selected = this.conList.find((con) => con.id === this.activeCon);
+            this.$txtTitle.innerHTML = selected.name;
+            $conList.activeId = this.activeCon;
+            this.$messageList.innerHTML = "";
+            this.listenMessage();
+        })
         this.$placeholder.appendChild($conList);
-    }
-
-    changeActiveCon(id) {
-
     }
 
     showCreateConForm() {
@@ -48,33 +54,45 @@ class ChatScreen extends HTMLElement {
         this.$placeholder.appendChild($conForm);
     }
 
+    listenMessage() {
+        if (this.messageListener) {
+            this.messageListener();
+        }
+        this.messageListener = db.collection("messages")
+            .where('conId', '==', this.activeCon)
+            .orderBy("createdAt")
+            .onSnapshot((querySnapshot) => {
+                querySnapshot.docChanges().forEach((change) => {
+                    if (change.type !== "added") return;
+                    const data = change.doc.data();
+                    const myMsg = document.createElement('my-message');
+                    myMsg.content = data.content;
+                    myMsg.displayName = data.sender.displayName;
+
+                    if (data.sender.email === firebase.auth().currentUser.email) {
+                        myMsg.isMine = true;
+                    }
+                    this.$messageList.prepend(myMsg);
+                })
+            });
+    }
+
     connectedCallback() {
 
         this.$chatForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            sendMsg(this.$message.value, "27UzSMBqJeaaE4HhXbXC");
+            sendMsg(this.$message.value, this.activeCon);
         })
-        db.collection("conversations").onSnapshot((querySnapshot) => {
-            this.conList = [];
-            querySnapshot.forEach((doc) => {
-                const item = doc.data();
-                item.id = doc.id;
-                this.conList.push(item);
+        db.collection("conversations")
+            .where('members', 'array-contains', firebase.auth().currentUser.email)
+            .onSnapshot((querySnapshot) => {
+                this.conList = [];
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    item.id = doc.id;
+                    this.conList.push(item);
+                });
             });
-        });
-        db.collection("messages").onSnapshot((querySnapshot) => {
-            querySnapshot.docChanges().forEach((change) => {
-                const data = change.doc.data();
-                const myMsg = document.createElement('my-message');
-                myMsg.content = data.content;
-                myMsg.displayName = data.sender.displayName;
-                
-                if(data.sender.email === firebase.auth().currentUser.email) {
-                    myMsg.isMine = true;
-                }
-                this.$messageList.appendChild(myMsg);
-            })
-        });
     }
 
 

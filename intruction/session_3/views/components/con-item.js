@@ -8,15 +8,23 @@ class ConItem extends HTMLElement {
         this.$container = this._shadowRoot.querySelector("#container");
     }
     static get observedAttributes() {
-        return ['name', 'no-of-mems', 'id'];
+        return ['name', 'no-of-mems', 'con-id', 'active'];
     }
 
-    set id(newVal) {
-        this.setAttribute('id', newVal);
+    set active(newVal) {
+        this.setAttribute('active', newVal);
     }
 
-    get id() {
-        return this.getAttribute('id');
+    get active() {
+        return this.getAttribute('active');
+    }
+
+    set conId(newVal) {
+        this.setAttribute('con-id', newVal);
+    }
+
+    get conId() {
+        return this.getAttribute('con-id');
     }
 
     set name(newVal) {
@@ -35,20 +43,30 @@ class ConItem extends HTMLElement {
         return this.getAttribute('no-of-mems')
     }
 
-    attributeChangedCallback() {
+    attributeChangedCallback(name, oldVal, newVal) {
+        if (name === "active") {
+            console.log(name, newVal);
+            if (newVal) {
+                console.log("hello");
+                this.$container.classList.add("active")
+            } else {
+                this.$container.classList.remove("active");
+            }
+        }
         this.$name.innerHTML = this.name;
         this.$noOfMems.innerHTML = this.noOfMems;
     }
 
     connectedCallback() {
         this.$container.addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.dispatchEvent(new CustomEvent('changeActiveCon', {
+            // event.stopPropagation();
+            const changeActiveConEvent = new CustomEvent('changeActiveCon', {
+                composed: true,
                 detail: {
-                    id: this.id,
-                    
+                    id: this.conId,
                 }
-            }));
+            });
+            this.dispatchEvent(changeActiveConEvent);
         });
     }
 }

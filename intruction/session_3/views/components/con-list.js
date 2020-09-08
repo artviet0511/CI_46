@@ -12,7 +12,11 @@ class ConList extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["list"];
+        return ["list", "active-id"];
+    }
+
+    set activeId(newVal) {
+        this.setAttribute('active-id', newVal);
     }
 
     set list(newVal) {
@@ -20,7 +24,15 @@ class ConList extends HTMLElement {
     }
 
     attributeChangedCallback(name, oldVal, newVal) {
-        console.log(JSON.parse(newVal));
+        if(name === "active-id") {
+            if(oldVal === newVal) return;
+            if(oldVal !== null){
+                this._shadowRoot.querySelector(`con-item[con-id='${oldVal}']`).active = "";
+
+            }
+            this._shadowRoot.querySelector(`con-item[con-id='${newVal}']`).active = true;
+
+        }
         if (name === "list") {
             this.$conList.innerHTML = '';
             JSON.parse(newVal).forEach(item => {
@@ -42,10 +54,11 @@ class ConList extends HTMLElement {
         const conItem = document.createElement('con-item');
         conItem.name = name;
         conItem.noOfMems = noOfMems;
-        conItem.id = id;
+        conItem.conId = id;
         this.$conList.appendChild(conItem);
     }
 
 }
 
 customElements.define('con-list', ConList);
+
